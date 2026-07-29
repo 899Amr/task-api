@@ -2,3 +2,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 *.py[cod]
+tasks.db
+tasks.db-shm
+tasks.db-wal
