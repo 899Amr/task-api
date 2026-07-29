@@ -5,3 +5,4 @@ __pycache__/
 tasks.db
 tasks.db-shm
 tasks.db-wal
+.env
