@@ -15,3 +15,5 @@ jobs:
           cache: pip
       - run: pip install -r requirements-dev.txt
       - run: pytest -q
+        env:
+          PYTHONPATH: .
