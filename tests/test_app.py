@@ -1,13 +1,19 @@
+from pathlib import Path
+
+import pytest
 from fastapi.testclient import TestClient
 
+import app as app_module
 from app import app
 
 
 client = TestClient(app)
 
 
-def setup_function() -> None:
-    client.post("/reset")
+@pytest.fixture(autouse=True)
+def isolated_database(tmp_path: Path) -> None:
+    app_module.DB_PATH = tmp_path / "test_tasks.db"
+    app_module.initialize_database()
 
 
 def test_root_and_health() -> None:
@@ -20,7 +26,7 @@ def test_read_and_not_found() -> None:
     assert client.get("/tasks/1").status_code == 200
     response = client.get("/tasks/99")
     assert response.status_code == 404
-    assert response.json() == {"error": "Task 99 not found"}
+    assert response.json() == {"error": "Task not found"}
 
 
 def test_full_crud_cycle() -> None:
@@ -48,6 +54,15 @@ def test_validation() -> None:
 
 def test_optional_features() -> None:
     assert len(client.get("/tasks?done=true").json()) == 1
-    assert len(client.get("/tasks?search=swagger").json()) == 1
+    assert len(client.get("/tasks?search=persistence").json()) == 1
     assert len(client.get("/tasks?limit=2&offset=1").json()) == 2
     assert client.get("/stats").json() == {"total": 3, "done": 1, "open": 2}
+
+
+def test_database_persists_and_seed_does_not_duplicate() -> None:
+    client.post("/tasks", json={"title": "Survive restart"})
+    app_module.initialize_database()
+    app_module.initialize_database()
+    tasks = client.get("/tasks").json()
+    assert len(tasks) == 4
+    assert any(task["title"] == "Survive restart" for task in tasks)
