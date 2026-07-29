@@ -1,9 +1,7 @@
-from pathlib import Path
-
 import pytest
 from fastapi.testclient import TestClient
 
-import app as app_module
+import database
 from app import app
 
 
@@ -11,14 +9,13 @@ client = TestClient(app)
 
 
 @pytest.fixture(autouse=True)
-def isolated_database(tmp_path: Path) -> None:
-    app_module.DB_PATH = tmp_path / "test_tasks.db"
-    app_module.initialize_database()
+def reset_database() -> None:
+    database.reset_tasks()
 
 
 def test_root_and_health() -> None:
     assert client.get("/").json()["name"] == "Task API"
-    assert client.get("/health").json() == {"status": "ok"}
+    assert client.get("/health").json() == {"status": "ok", "db": "ok"}
 
 
 def test_read_and_not_found() -> None:
@@ -61,8 +58,8 @@ def test_optional_features() -> None:
 
 def test_database_persists_and_seed_does_not_duplicate() -> None:
     client.post("/tasks", json={"title": "Survive restart"})
-    app_module.initialize_database()
-    app_module.initialize_database()
+    database.initialize_database()
+    database.initialize_database()
     tasks = client.get("/tasks").json()
     assert len(tasks) == 4
     assert any(task["title"] == "Survive restart" for task in tasks)
