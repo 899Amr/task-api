@@ -35,9 +35,11 @@ def initialize_database() -> None:
         count = connection.execute("SELECT COUNT(*) AS total FROM tasks").fetchone()
         if count["total"] == 0:
             with connection.transaction():
-                connection.executemany(
-                    "INSERT INTO tasks (title, done) VALUES (%s, %s)", INITIAL_TASKS
-                )
+                with connection.cursor() as cursor:
+                    cursor.executemany(
+                        "INSERT INTO tasks (title, done) VALUES (%s, %s)",
+                        INITIAL_TASKS,
+                    )
 
 
 def list_tasks(
@@ -123,9 +125,11 @@ def reset_tasks() -> list[dict]:
     with connect() as connection:
         with connection.transaction():
             connection.execute("TRUNCATE tasks RESTART IDENTITY")
-            connection.executemany(
-                "INSERT INTO tasks (title, done) VALUES (%s, %s)", INITIAL_TASKS
-            )
+            with connection.cursor() as cursor:
+                cursor.executemany(
+                    "INSERT INTO tasks (title, done) VALUES (%s, %s)",
+                    INITIAL_TASKS,
+                )
     return list_tasks()
 
 
