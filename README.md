@@ -1,5 +1,9 @@
 # Task API
 
+## Week 5 scraper
+
+The repository now also contains [The Polite Scraper](scraper/README.md), a cached and schema-validated pipeline that collects exactly 60 books from the first three pages of the approved Books to Scrape training sandbox. Its own README contains the run command, ethics and target classification, record schema, politeness rules, tests, and real run evidence.
+
 A containerized CRUD API built with Python, FastAPI, PostgreSQL, Docker Compose, and Supabase Auth. It supports account creation, JWT login, reusable route protection, role checks, and token refresh.
 
 ## Run it
