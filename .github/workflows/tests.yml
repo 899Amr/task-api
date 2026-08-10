@@ -35,3 +35,8 @@ jobs:
       - run: pytest -q
         env:
           PYTHONPATH: .
+      - run: pip install -r scraper/requirements-dev.txt
+      - run: pytest -q
+        working-directory: scraper
+        env:
+          PYTHONPATH: .
