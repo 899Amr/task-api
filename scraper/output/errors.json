@@ -1,0 +1,6 @@
+[
+  {
+    "product_url": "https://books.toscrape.com/catalogue/deliberately-missing-book/index.html",
+    "reason": "HTTP Error 404: Deliberate failure test"
+  }
+]
